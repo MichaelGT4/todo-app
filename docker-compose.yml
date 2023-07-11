@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  todoapp:
+    container_name: ToDo-App
+    restart: unless-stopped
+    image: michaelgt4/todoapp:latest
+    build:
+      context: ./
+      target: dev
+    volumes:
+      - .:/src
+    command: npm run dev
+    ports:
+      - "5000:5000"
