@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Todos } from './Components/Todos'
 import './App.css'
-import { type onCompleteTodo, type TodoId } from './types'
+import { type onCompleteTodo, type TodoId, type Estado } from './types'
+import { TodosContainer } from './Components/TodosContainer'
 
 const todoList = [
   {
@@ -26,12 +26,24 @@ const todoList = [
   }
 ]
 
+const statusTypes: Estado[] =  ["Ideas","En Proceso", "Terminado"]
 
 function App (): JSX.Element {
   const [todos, setTodos] = useState(todoList)
-  const Ideas = todos.filter(todo => todo.completed === "Ideas")
-  const porHacer = todos.filter(todo => todo.completed === "En Proceso")
-  const Completed = todos.filter(todo => todo.completed === "Terminado")
+
+  const [isDragging, setIsDragging] = useState(false)
+  const handleDragging = (dragging: boolean) => setIsDragging(dragging)
+
+  const handleUpdateList = (id: string, status: Estado) => {
+    let card = todos.find(item => item.id === id)
+    if (card && card.completed !== status) {
+        card.completed = status
+        setTodos( prev => ([
+             card!,
+             ...prev.filter(item => item.id !== id)
+         ]))
+    }
+}
 
   function handleRemove ({ id }: TodoId): void {
     const newTodos = todos.filter(todo => todo.id !== id)
@@ -39,16 +51,26 @@ function App (): JSX.Element {
   }
 
   function handleCompleted ({ id, completed }: onCompleteTodo): void {
-    const newTodos = todos.map(todo => {
-      if (todo.id === id) {
-        return {
-          ...todo,
-          completed
+    let card = todos.find(item => item.id === id)
+    if (card && card.completed !== completed) {
+        card.completed = completed
+        if (Array.isArray(todos)){
+          setTodos( prev => ([
+            card!,
+            ...prev.filter(item => item.id !== id)
+          ]))
         }
-      }
-      return todo
-    })
-    setTodos(newTodos)
+    }
+    // const newTodos = todos.map(todo => {
+    //   if (todo.id === id) {
+    //     return {
+    //       ...todo,
+    //       completed
+    //     }
+    //   }
+    //   return todo
+    // })
+    // setTodos(newTodos)
   }
 
   return (
@@ -60,24 +82,19 @@ function App (): JSX.Element {
         </h1>
       </div>
       <div className="w-full grid text-center lg:mb-0 lg:grid-cols-3 md:grid-cols-2 justify-center lg:text-left">
-
-        {/* Ideas */}
-        <div className=" m-5 min-h-0 rounded-lg justify-center border lg:p-8 sm:p-2 dark:bg-neutral-800/50 border-neutral-700" onDrop="dropIt(event)" ondragover="allowDrop(event)">
-          <h2 className={'mb-2 text-2xl font-semibold'}>Ideas</h2>
-          <Todos todos={Ideas} onRemoveTodo={handleRemove} onToggleCompleteTodo={handleCompleted} />
-        </div>
-
-        {/* /* En Proceso **/}
-        <div className=" m-5 min-h-0 rounded-lg justify-center border lg:p-10 sm:p-2 dark:bg-neutral-800/50 border-neutral-700">
-          <h2 className={'mb-2 text-2xl font-semibold'}>En Proceso</h2>
-          <Todos todos={porHacer} onRemoveTodo={handleRemove} onToggleCompleteTodo={handleCompleted} />
-        </div>
-
-        {/* Terminado */}
-        <div className=" m-5 min-h-0 rounded-lg justify-center border lg:p-10 sm:p-2 dark:bg-neutral-800/50 border-neutral-700">
-          <h2 className={'mb-2 text-2xl font-semibold'}>Terminado</h2>
-          <Todos todos={Completed} onRemoveTodo={handleRemove} onToggleCompleteTodo={handleCompleted} />
-        </div>
+       
+        {statusTypes.map(stat => (
+          <TodosContainer 
+            todos={todos} 
+            status={stat} 
+            key={stat} 
+            
+            isDragging={isDragging} 
+            handleDragging={handleDragging} 
+            handleUpdateList={handleUpdateList}
+            onRemoveTodo={handleRemove}
+            onToggleCompleteTodo={handleCompleted} />
+        ))}
       </div>
     </main>
   )
