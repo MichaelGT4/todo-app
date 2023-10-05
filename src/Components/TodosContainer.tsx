@@ -24,21 +24,20 @@ export const TodosContainer: React.FC<Props> = ({todos, status, isDragging, hand
 
   return (
     <div>
-        <div className={`m-5 min-h-0 rounded-lg justify-center border lg:p-8 sm:p-2 dark:bg-neutral-800/50 border-neutral-700 ${isDragging ? 'layout-dragging' : ''}`} onDrop={handleDrop} onDragOver={handleDragOver}>
+      <div className={`m-5 min-h-0 rounded-lg justify-center border lg:p-8 sm:p-2 dark:bg-neutral-800/75 border-neutral-700 ${isDragging ? 'layout-dragging' : ''}`} onDrop={handleDrop} onDragOver={handleDragOver}>
         <h2 className={'mb-2 text-2xl font-semibold'}>{status}</h2>
-        {
+          {
             todos.map(item => (
-                status === item.completed 
-                && <Todos 
-                    todo={item} 
-                    key={item.id}
-                    handleDragging={handleDragging} 
-                    onRemoveTodo={onRemoveTodo}
-                    onToggleCompleteTodo={onToggleCompleteTodo}
-                />
-
+              status === item.completed 
+              && <Todos 
+                todo={item} 
+                key={item.id}
+                handleDragging={handleDragging} 
+                onRemoveTodo={onRemoveTodo}
+                onToggleCompleteTodo={onToggleCompleteTodo}
+              />
             ))
-        }
+          }
       </div>
     </div>
     )
